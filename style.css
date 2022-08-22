@@ -1,0 +1,12 @@
+.mainContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 640px;
+}
+
+.screen {
+  border: 1px solid black;
+  width: inherit;
+}
