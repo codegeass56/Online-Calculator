@@ -11,9 +11,10 @@
   width: 640px;
 }
 
-.screen {
+.screen-container {
   border: 1px solid black;
   width: inherit;
+  height: 40px;
 }
 
 .buttons-container {
