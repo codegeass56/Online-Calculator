@@ -169,7 +169,7 @@ function add(value) {
   if (inputNumbers.length >= 2) {
     displayScreen.textContent = inputNumbers.reduce((previousValue, currentValue) => previousValue + currentValue);
     inputNumbers = [];
-    inputNumbers.push(displayScreen.textContent);
+    inputNumbers.push(Number(displayScreen.textContent));
   }
 }
 
@@ -181,7 +181,7 @@ function subtract(value) {
   if (inputNumbers.length >= 2) {
     displayScreen.textContent = inputNumbers.reduce((previousValue, currentValue) => previousValue - currentValue);
     inputNumbers = [];
-    inputNumbers.push(displayScreen.textContent);
+    inputNumbers.push(Number(displayScreen.textContent));
   }
 }
 
@@ -193,7 +193,7 @@ function multiply(value) {
   if (inputNumbers.length >= 2) {
     displayScreen.textContent = inputNumbers.reduce((previousValue, currentValue) => previousValue * currentValue);
     inputNumbers = [];
-    inputNumbers.push(displayScreen.textContent);
+    inputNumbers.push(Number(displayScreen.textContent));
   }
 }
 
@@ -210,7 +210,7 @@ function divide(divisor) {
   if (inputNumbers.length >= 2) {
     displayScreen.textContent = Math.round(inputNumbers.reduce((previousValue, currentValue) => previousValue / currentValue));
     inputNumbers = [];
-    inputNumbers.push(displayScreen.textContent);
+    inputNumbers.push(Number(displayScreen.textContent));
   }
 }
 
