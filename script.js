@@ -161,56 +161,22 @@ function createCalculatorGrid(rowSize, colSize, gridContainer) {
   }
 }
 
-function add(value) {
-  //Add input number to array
-  inputNumbers.push(value);
-
-  //Check if it is a chaining operation involving more than 2 numbers
-  if (inputNumbers.length >= 2) {
-    displayScreen.textContent = inputNumbers.reduce((previousValue, currentValue) => previousValue + currentValue);
-    inputNumbers = [];
-    inputNumbers.push(Number(displayScreen.textContent));
+//Executes the previous operation and sets the next operation
+function executePrevOperation(nextOperationToBeSet) {
+  //Execute previous operation
+  switch (currentOperator) {
+    case 'add': operate(addBtnClassName, Number(displayScreen.textContent)); break;
+    case 'subtract': operate(subtractBtnClassName, Number(displayScreen.textContent)); break;
+    case 'multiply': operate(multiplyBtnClassName, Number(displayScreen.textContent)); break;
+    case 'divide': operate(divideBtnClassName, Number(displayScreen.textContent)); break;
   }
-}
 
-function subtract(value) {
-  //Add input number to array
-  inputNumbers.push(value);
-
-  //Check if it is a chaining operation involving more than 2 numbers
-  if (inputNumbers.length >= 2) {
-    displayScreen.textContent = inputNumbers.reduce((previousValue, currentValue) => previousValue - currentValue);
-    inputNumbers = [];
-    inputNumbers.push(Number(displayScreen.textContent));
-  }
-}
-
-function multiply(value) {
-  //Add input number to array
-  inputNumbers.push(value);
-
-  //Check if it is a chaining operation involving more than 2 numbers
-  if (inputNumbers.length >= 2) {
-    displayScreen.textContent = inputNumbers.reduce((previousValue, currentValue) => previousValue * currentValue);
-    inputNumbers = [];
-    inputNumbers.push(Number(displayScreen.textContent));
-  }
-}
-
-function divide(divisor) {
-  //if divisor is zero then do nothing
-  if (!divisor) {
-    displayScreen.textContent = 'Division by zero!';
-    return;
-  }
-  //Add input number to array
-  inputNumbers.push(divisor);
-
-  //Check if it is a chaining operation involving more than 2 numbers
-  if (inputNumbers.length >= 2) {
-    displayScreen.textContent = Math.round(inputNumbers.reduce((previousValue, currentValue) => previousValue / currentValue));
-    inputNumbers = [];
-    inputNumbers.push(Number(displayScreen.textContent));
+  //Set the next operation
+  switch (nextOperationToBeSet) {
+    case addBtnClassName: currentOperator = 'add'; break;
+    case subtractBtnClassName: currentOperator = 'subtract'; break;
+    case multiplyBtnClassName: currentOperator = 'multiply'; break;
+    case divideBtnClassName: currentOperator = 'divide'; break;
   }
 }
 
@@ -271,21 +237,55 @@ function showFinalResult(lastInput) {
   inputNumbers = [];
 }
 
-//Executes the previous operation and sets the next operation
-function executePrevOperation(nextOperationToBeSet) {
-  //Execute previous operation
-  switch (currentOperator) {
-    case 'add': operate(addBtnClassName, Number(displayScreen.textContent)); break;
-    case 'subtract': operate(subtractBtnClassName, Number(displayScreen.textContent)); break;
-    case 'multiply': operate(multiplyBtnClassName, Number(displayScreen.textContent)); break;
-    case 'divide': operate(divideBtnClassName, Number(displayScreen.textContent)); break;
-  }
+function add(value) {
+  //Add input number to array
+  inputNumbers.push(value);
 
-  //Set the next operation
-  switch (nextOperationToBeSet) {
-    case addBtnClassName: currentOperator = 'add'; break;
-    case subtractBtnClassName: currentOperator = 'subtract'; break;
-    case multiplyBtnClassName: currentOperator = 'multiply'; break;
-    case divideBtnClassName: currentOperator = 'divide'; break;
+  //Check if it is a chaining operation involving more than 2 numbers
+  if (inputNumbers.length >= 2) {
+    displayScreen.textContent = inputNumbers.reduce((previousValue, currentValue) => previousValue + currentValue);
+    inputNumbers = [];
+    inputNumbers.push(Number(displayScreen.textContent));
+  }
+}
+
+function subtract(value) {
+  //Add input number to array
+  inputNumbers.push(value);
+
+  //Check if it is a chaining operation involving more than 2 numbers
+  if (inputNumbers.length >= 2) {
+    displayScreen.textContent = inputNumbers.reduce((previousValue, currentValue) => previousValue - currentValue);
+    inputNumbers = [];
+    inputNumbers.push(Number(displayScreen.textContent));
+  }
+}
+
+function multiply(value) {
+  //Add input number to array
+  inputNumbers.push(value);
+
+  //Check if it is a chaining operation involving more than 2 numbers
+  if (inputNumbers.length >= 2) {
+    displayScreen.textContent = inputNumbers.reduce((previousValue, currentValue) => previousValue * currentValue);
+    inputNumbers = [];
+    inputNumbers.push(Number(displayScreen.textContent));
+  }
+}
+
+function divide(divisor) {
+  //if divisor is zero then do nothing
+  if (!divisor) {
+    displayScreen.textContent = 'Division by zero!';
+    return;
+  }
+  //Add input number to array
+  inputNumbers.push(divisor);
+
+  //Check if it is a chaining operation involving more than 2 numbers
+  if (inputNumbers.length >= 2) {
+    displayScreen.textContent = Math.round(inputNumbers.reduce((previousValue, currentValue) => previousValue / currentValue));
+    inputNumbers = [];
+    inputNumbers.push(Number(displayScreen.textContent));
   }
 }
