@@ -1,11 +1,17 @@
-//Global variables
-let accumulator = 0;
+/*Global variables*/
+//Holds the current operator
 let currentOperator = null;
+
+//Flag to check if user can input
 let userInputStateActive = true;
+
+//Holds the last calculation result
 let prevResult = null;
+
+//Holds the sequence of number inputs
 let inputNumbers = [];
 
-//Button class variables
+//Class names assigned to buttons
 const numBtnClassName = 'number-button';
 const operatorBtnClassName = 'operator';
 const addBtnClassName = 'add-button';
@@ -15,67 +21,82 @@ const divideBtnClassName = 'divide-button';
 const equalsBtnClassName = 'equals-button';
 const dotBtnClassName = 'dot-button';
 
-//Get display screen
+//Get display screen and set to default value
 const displayScreen = document.querySelector('.screen-content');
 displayScreen.textContent = '0';
 
-//Create calculator grid
+//Create calculator buttons grid
 const buttonContainer = document.querySelector('.buttons-container');
 createCalculatorGrid(4, 4, buttonContainer);
 
-// Add listeners to number buttons
+// Get number buttons
 const numBtnArray = document.querySelectorAll('.number-button');
 
+//Add listeners to all number buttons
 for (let i = 0; i < numBtnArray.length; i++) {
   numBtnArray[i].addEventListener('click', () => {
+    //Check for previous user input
     if (userInputStateActive) {
       displayScreen.textContent = '';
       userInputStateActive = false;
     }
+    //Append number to screen value
     displayScreen.textContent += numBtnArray[i].textContent;
+
+    //Clear any previous calculation result
     if (prevResult) {
       prevResult = null;
     }
   });
 }
 
-//Add listeners to operator buttons
+//Get operator buttons
 const operatorBtnArray = document.querySelectorAll('.operator');
 
+//Add listeners to all operator buttons
 for (let i = 0; i < operatorBtnArray.length; i++) {
   operatorBtnArray[i].addEventListener('click', () => {
+    //Check if operation is to be performed on a previous result
     if (prevResult) {
-      // accumulator = prevResult;
-      inputNumbers.push(prevResult);
+      inputNumbers.push(prevResult); //Append previous result to array of inputs
       prevResult = null;
     }
 
     if (operatorBtnArray[i].classList.contains(addBtnClassName)) {
+      //Check if any pending operation is to be performed to update the display
       if (currentOperator != null && currentOperator != 'add') {
         executePrevOperation(addBtnClassName);
       } else {
-        currentOperator = 'add';
+        if (currentOperator != 'add') {
+          currentOperator = 'add';
+        }
         operate(addBtnClassName, Number(displayScreen.textContent));
       }
     } else if (operatorBtnArray[i].classList.contains(subtractBtnClassName)) {
       if (currentOperator != null && currentOperator != 'subtract') {
         executePrevOperation(subtractBtnClassName);
       } else {
-        currentOperator = 'subtract';
+        if (currentOperator != 'subtract') {
+          currentOperator = 'subtract';
+        }
         operate(subtractBtnClassName, Number(displayScreen.textContent));
       }
     } else if (operatorBtnArray[i].classList.contains(multiplyBtnClassName)) {
       if (currentOperator != null && currentOperator != 'multiply') {
         executePrevOperation(multiplyBtnClassName);
       } else {
-        currentOperator = 'multiply';
+        if (currentOperator != 'multiply') {
+          currentOperator = 'multiply';
+        }
         operate(multiplyBtnClassName, Number(displayScreen.textContent));
       }
     } else if (operatorBtnArray[i].classList.contains(divideBtnClassName)) {
       if (currentOperator != null && currentOperator != 'divide') {
         executePrevOperation(divideBtnClassName);
       } else {
-        currentOperator = 'divide';
+        if (currentOperator != 'divide') {
+          currentOperator = 'divide';
+        }
         operate(divideBtnClassName, Number(displayScreen.textContent));
       }
     } else if (operatorBtnArray[i].classList.contains(equalsBtnClassName)) {
@@ -84,118 +105,7 @@ for (let i = 0; i < operatorBtnArray.length; i++) {
   });
 }
 
-function add(value) {
-  //Add input number to array
-  inputNumbers.push(value);
-
-  //accumulator += value;
-
-  //Check if it is a chaining operation involving more than 2 numbers
-  if (inputNumbers.length >= 2) {
-    displayScreen.textContent = inputNumbers.reduce((previousValue, currentValue) => previousValue + currentValue);
-    // displayScreen.textContent = accumulator;
-  }
-}
-
-function subtract(value) {
-  accumulator -= value;
-  displayScreen.textContent = accumulator;
-}
-
-function multiply(value) {
-  accumulator *= value;
-  displayScreen.textContent = accumulator;
-}
-
-function divide(divisor) {
-  if (divisor === 0) {
-    accumulator = 0;
-  } else {
-    accumulator /= divisor;
-  }
-
-  displayScreen.textContent = accumulator;
-}
-
-//Perform operation on value
-function operate(operatorName, value) {
-  if (userInputStateActive === false) {
-    //Check operator name based on class
-    switch (operatorName) {
-      case addBtnClassName:
-        add(value);
-        userInputStateActive = true; //Expect user input after operation
-        break;
-
-      case subtractBtnClassName:
-        subtract(value);
-        userInputStateActive = true;
-        break;
-
-      case multiplyBtnClassName:
-        multiply(value);
-        userInputStateActive = true;
-        break;
-
-      case divideBtnClassName:
-        divide(value);
-        userInputStateActive = true;
-        break;
-
-      //Finalize result if equals
-      case equalsBtnClassName:
-        if (currentOperator === 'add') {
-          // add(value);
-          showFinalResult(add, value);
-        } else if (currentOperator === 'subtract') {
-          subtract(value);
-          showFinalResult();
-        } else if (currentOperator === 'multiply') {
-          multiply(value);
-          showFinalResult();
-        } else if (currentOperator === 'divide') {
-          divide(value);
-          showFinalResult();
-        }
-        break;
-    }
-  }
-}
-
-//Reset variables and show final result
-function showFinalResult(finalOperation, lastInput) {
-
-  //Add input number to array
-  inputNumbers.push(lastInput);
-  prevResult = inputNumbers.reduce((previousValue, currentValue) => previousValue + currentValue);
-
-  // displayScreen.textContent = accumulator;
-  userInputStateActive = true;
-  displayScreen.textContent = prevResult;
-  // accumulator = 0;
-  currentOperator = null;
-  inputNumbers = [];
-}
-
-//Function to execute previous operation and set the next operation
-function executePrevOperation(nextOperation) {
-  let value = displayScreen.textContent;
-  switch (currentOperator) {
-    case 'add': operate(addBtnClassName, Number(displayScreen.textContent)); break;
-    case 'subtract': operate(subtractBtnClassName, Number(displayScreen.textContent)); break;
-    case 'multiply': operate(multiplyBtnClassName, Number(displayScreen.textContent)); break;
-    case 'divide': operate(divideBtnClassName, Number(displayScreen.textContent)); break;
-  }
-
-  //Set the next operation
-  switch (nextOperation) {
-    case addBtnClassName: currentOperator = 'add'; break;
-    case subtractBtnClassName: currentOperator = 'subtract'; break;
-    case multiplyBtnClassName: currentOperator = 'multiply'; break;
-    case divideBtnClassName: currentOperator = 'divide'; break;
-  }
-}
-
+//Creates a very specific calculator buttons grid
 function createCalculatorGrid(rowSize, colSize, gridContainer) {
   let buttonTextValue = 7;
   //Create the buttons as grid items
@@ -248,5 +158,134 @@ function createCalculatorGrid(rowSize, colSize, gridContainer) {
       }
       gridContainer.appendChild(gridItem);
     }
+  }
+}
+
+function add(value) {
+  //Add input number to array
+  inputNumbers.push(value);
+
+  //Check if it is a chaining operation involving more than 2 numbers
+  if (inputNumbers.length >= 2) {
+    displayScreen.textContent = inputNumbers.reduce((previousValue, currentValue) => previousValue + currentValue);
+    inputNumbers = [];
+    inputNumbers.push(displayScreen.textContent);
+  }
+}
+
+function subtract(value) {
+  //Add input number to array
+  inputNumbers.push(value);
+
+  //Check if it is a chaining operation involving more than 2 numbers
+  if (inputNumbers.length >= 2) {
+    displayScreen.textContent = inputNumbers.reduce((previousValue, currentValue) => previousValue - currentValue);
+    inputNumbers = [];
+    inputNumbers.push(displayScreen.textContent);
+  }
+}
+
+function multiply(value) {
+  //Add input number to array
+  inputNumbers.push(value);
+
+  //Check if it is a chaining operation involving more than 2 numbers
+  if (inputNumbers.length >= 2) {
+    displayScreen.textContent = inputNumbers.reduce((previousValue, currentValue) => previousValue * currentValue);
+    inputNumbers = [];
+    inputNumbers.push(displayScreen.textContent);
+  }
+}
+
+function divide(divisor) {
+  //if divisor is zero then do nothing
+  if (!divisor) {
+    displayScreen.textContent = 'Division by zero!';
+    return;
+  }
+  //Add input number to array
+  inputNumbers.push(divisor);
+
+  //Check if it is a chaining operation involving more than 2 numbers
+  if (inputNumbers.length >= 2) {
+    displayScreen.textContent = Math.round(inputNumbers.reduce((previousValue, currentValue) => previousValue / currentValue));
+    inputNumbers = [];
+    inputNumbers.push(displayScreen.textContent);
+  }
+}
+
+//Perform operation on value as per operator name
+function operate(operatorName, value) {
+  //Check for user input mode
+  if (userInputStateActive === false) {
+    switch (operatorName) {
+      case addBtnClassName:
+        add(value);
+        userInputStateActive = true; //Enable user input after calculation
+        break;
+
+      case subtractBtnClassName:
+        subtract(value);
+        userInputStateActive = true;
+        break;
+
+      case multiplyBtnClassName:
+        multiply(value);
+        userInputStateActive = true;
+        break;
+
+      case divideBtnClassName:
+        divide(value);
+        userInputStateActive = true;
+        break;
+
+      //Finalize result if equals button is clicked
+      case equalsBtnClassName:
+        if (currentOperator === 'add') {
+          showFinalResult(value);
+        } else if (currentOperator === 'subtract') {
+          showFinalResult(value);
+        } else if (currentOperator === 'multiply') {
+          showFinalResult(value);
+        } else if (currentOperator === 'divide') {
+          showFinalResult(value);
+        }
+        break;
+    }
+  }
+}
+
+//Calculate and show final results
+function showFinalResult(lastInput) {
+  switch (currentOperator) {
+    case 'add': add(lastInput); break;
+    case 'subtract': subtract(lastInput); break;
+    case 'multiply': multiply(lastInput); break;
+    case 'divide': divide(lastInput); break;
+  }
+
+  //Reset global variables
+  prevResult = Number(displayScreen.textContent);
+  userInputStateActive = true;
+  currentOperator = null;
+  inputNumbers = [];
+}
+
+//Executes the previous operation and sets the next operation
+function executePrevOperation(nextOperationToBeSet) {
+  //Execute previous operation
+  switch (currentOperator) {
+    case 'add': operate(addBtnClassName, Number(displayScreen.textContent)); break;
+    case 'subtract': operate(subtractBtnClassName, Number(displayScreen.textContent)); break;
+    case 'multiply': operate(multiplyBtnClassName, Number(displayScreen.textContent)); break;
+    case 'divide': operate(divideBtnClassName, Number(displayScreen.textContent)); break;
+  }
+
+  //Set the next operation
+  switch (nextOperationToBeSet) {
+    case addBtnClassName: currentOperator = 'add'; break;
+    case subtractBtnClassName: currentOperator = 'subtract'; break;
+    case multiplyBtnClassName: currentOperator = 'multiply'; break;
+    case divideBtnClassName: currentOperator = 'divide'; break;
   }
 }
