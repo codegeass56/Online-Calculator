@@ -3,6 +3,7 @@ let accumulator = 0;
 let currentOperator = null;
 let userInputStateActive = true;
 let prevResult = null;
+let inputNumbers = [];
 
 //Button class variables
 const numBtnClassName = 'number-button';
@@ -32,17 +33,20 @@ for (let i = 0; i < numBtnArray.length; i++) {
       userInputStateActive = false;
     }
     displayScreen.textContent += numBtnArray[i].textContent;
-    prevResult = null;
+    if (prevResult) {
+      prevResult = null;
+    }
   });
 }
 
 //Add listeners to operator buttons
-const operatorBtnArray = document.querySelectorAll('button.operator');
+const operatorBtnArray = document.querySelectorAll('.operator');
 
 for (let i = 0; i < operatorBtnArray.length; i++) {
   operatorBtnArray[i].addEventListener('click', () => {
     if (prevResult) {
-      accumulator = prevResult;
+      // accumulator = prevResult;
+      inputNumbers.push(prevResult);
       prevResult = null;
     }
 
@@ -81,8 +85,16 @@ for (let i = 0; i < operatorBtnArray.length; i++) {
 }
 
 function add(value) {
-  accumulator += value;
-  displayScreen.textContent = accumulator;
+  //Add input number to array
+  inputNumbers.push(value);
+
+  //accumulator += value;
+
+  //Check if it is a chaining operation involving more than 2 numbers
+  if (inputNumbers.length >= 2) {
+    displayScreen.textContent = inputNumbers.reduce((previousValue, currentValue) => previousValue + currentValue);
+    // displayScreen.textContent = accumulator;
+  }
 }
 
 function subtract(value) {
@@ -133,8 +145,8 @@ function operate(operatorName, value) {
       //Finalize result if equals
       case equalsBtnClassName:
         if (currentOperator === 'add') {
-          add(value);
-          showFinalResult();
+          // add(value);
+          showFinalResult(add, value);
         } else if (currentOperator === 'subtract') {
           subtract(value);
           showFinalResult();
@@ -151,12 +163,18 @@ function operate(operatorName, value) {
 }
 
 //Reset variables and show final result
-function showFinalResult() {
-  displayScreen.textContent = accumulator;
+function showFinalResult(finalOperation, lastInput) {
+
+  //Add input number to array
+  inputNumbers.push(lastInput);
+  prevResult = inputNumbers.reduce((previousValue, currentValue) => previousValue + currentValue);
+
+  // displayScreen.textContent = accumulator;
   userInputStateActive = true;
-  prevResult = accumulator;
-  accumulator = 0;
+  displayScreen.textContent = prevResult;
+  // accumulator = 0;
   currentOperator = null;
+  inputNumbers = [];
 }
 
 //Function to execute previous operation and set the next operation
@@ -214,7 +232,8 @@ function createCalculatorGrid(rowSize, colSize, gridContainer) {
               break;
 
             case 1: gridItem.textContent = '.';
-              gridItem.classList.add(dotBtnClassName); break;
+              gridItem.classList.add(dotBtnClassName);
+              break;
 
             case 2: gridItem.textContent = '=';
               gridItem.classList.add(operatorBtnClassName);
