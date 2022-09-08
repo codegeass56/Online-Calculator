@@ -27,7 +27,7 @@ displayScreen.textContent = '0';
 
 //Create calculator buttons grid
 const buttonContainer = document.querySelector('.buttons-container');
-createCalculatorGrid(4, 4, buttonContainer);
+createCalculatorGrid();
 
 // Get number buttons
 const numBtnArray = document.querySelectorAll('.number-button');
@@ -106,11 +106,11 @@ for (let i = 0; i < operatorBtnArray.length; i++) {
 }
 
 //Creates a very specific calculator buttons grid
-function createCalculatorGrid(rowSize, colSize, gridContainer) {
+function createCalculatorGrid() {
   let buttonTextValue = 7;
   //Create the buttons as grid items
-  for (let rowCount = 0; rowCount < rowSize; rowCount++) {
-    for (let colCount = 0; colCount < colSize; colCount++) {
+  for (let rowCount = 0; rowCount < 4; rowCount++) {
+    for (let colCount = 0; colCount < 4; colCount++) {
       const gridItem = document.createElement('button');
       if (colCount === 3) {
         switch (rowCount) {
@@ -156,9 +156,20 @@ function createCalculatorGrid(rowSize, colSize, gridContainer) {
           buttonTextValue++;
         }
       }
-      gridContainer.appendChild(gridItem);
+      buttonContainer.appendChild(gridItem);
     }
   }
+  const clearBtn = document.createElement('button');
+  clearBtn.classList.add('clear-button');
+  clearBtn.textContent = 'AC';
+  clearBtn.addEventListener('click', () => {
+    displayScreen.textContent = '0';
+    userInputStateActive = true;
+    currentOperator = null;
+    inputNumbers = [];
+  });
+  buttonContainer.appendChild(clearBtn);
+
 }
 
 //Executes the previous operation and sets the next operation
