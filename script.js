@@ -35,6 +35,7 @@ const numBtnArray = document.querySelectorAll('.number-button');
 //Add listeners to all number buttons
 for (let i = 0; i < numBtnArray.length; i++) {
   numBtnArray[i].addEventListener('click', () => {
+    displayScreen.style.fontSize = '80px';
     //Check for previous user input
     if (userInputStateActive) {
       displayScreen.textContent = '';
@@ -50,6 +51,151 @@ for (let i = 0; i < numBtnArray.length; i++) {
     }
   });
 }
+
+/*Keyboard events*/
+document.addEventListener('keypress', (event) => {
+  //Check if number key is pressed
+  if (isNaN(event.key) === false) {
+    displayScreen.style.fontSize = '80px';
+    //Get clicked number key
+    let numberButtons = document.querySelectorAll('.' + numBtnClassName);
+    let clickedButton = Array.from(numberButtons).find(element => element.textContent === event.key);
+
+    //Trigger animation
+    clickedButton.style.transform = "scale(1.1)";
+    clickedButton.style.backgroundColor = 'grey';
+    setTimeout(() => {
+      clickedButton.style.transform = "scale(1)";
+      clickedButton.style.backgroundColor = 'black';
+    }, 150)
+
+    //Check for previous user input
+    if (userInputStateActive) {
+      displayScreen.textContent = '';
+      userInputStateActive = false;
+    }
+    if (displayScreen.textContent.length < 11) {
+      //Append number to screen value
+      displayScreen.textContent += event.key;
+    }
+    //Clear any previous calculation result
+    if (prevResult) {
+      prevResult = null;
+    }
+  }
+  //Check if operator key is pressed
+  else {
+    //Get clicked operator key
+    let operatorButtons = document.querySelectorAll('.' + operatorBtnClassName);
+    let clickedButton;
+    switch (event.key) {
+      case '+': clickedButton = Array.from(operatorButtons)
+        .find(element => element.textContent === '+');
+        break;
+      case '-': clickedButton = Array.from(operatorButtons)
+        .find(element => element.textContent === '-');
+        break;
+      case 'X':
+      case '*':
+      case 'x': clickedButton = Array.from(operatorButtons)
+        .find(element => element.textContent === 'x');
+        break;
+      case '/': clickedButton = Array.from(operatorButtons)
+        .find(element => element.textContent === '÷');
+        break;
+      case 'Enter':
+      case '=': clickedButton = Array.from(operatorButtons)
+        .find(element => element.textContent === '=');
+        break;
+      default: return;
+    }
+
+    //Trigger animation
+    clickedButton.style.transform = "scale(1.1)";
+    clickedButton.style.backgroundColor = 'grey';
+    setTimeout(() => {
+      clickedButton.style.transform = "scale(1)";
+      clickedButton.style.backgroundColor = 'black';
+    }, 150)
+    if (prevResult) {
+      inputNumbers.push(prevResult); //Append previous result to array of inputs
+      prevResult = null;
+    }
+    //Trigger operation
+    switch (event.key) {
+      case '+':
+        //Check if any pending operation is to be performed to update the display
+        if (currentOperator != null && currentOperator != 'add') {
+          executePrevOperation(addBtnClassName);
+        } else {
+          if (currentOperator != 'add') {
+            currentOperator = 'add';
+          }
+          operate(addBtnClassName, Number(displayScreen.textContent));
+        }
+        break;
+      case '-':
+        if (currentOperator != null && currentOperator != 'subtract') {
+          executePrevOperation(subtractBtnClassName);
+        } else {
+          if (currentOperator != 'subtract') {
+            currentOperator = 'subtract';
+          }
+          operate(subtractBtnClassName, Number(displayScreen.textContent));
+        }
+        break;
+      case '*':
+      case 'X':
+      case 'x':
+        if (currentOperator != null && currentOperator != 'multiply') {
+          executePrevOperation(multiplyBtnClassName);
+        } else {
+          if (currentOperator != 'multiply') {
+            currentOperator = 'multiply';
+          }
+          operate(multiplyBtnClassName, Number(displayScreen.textContent));
+        }
+        break;
+      case '/':
+        if (currentOperator != null && currentOperator != 'divide') {
+          executePrevOperation(divideBtnClassName);
+        } else {
+          if (currentOperator != 'divide') {
+            currentOperator = 'divide';
+          }
+          operate(divideBtnClassName, Number(displayScreen.textContent));
+        }
+        break;
+      case 'Enter':
+      case '=':
+        operate(equalsBtnClassName, Number(displayScreen.textContent));
+        break;
+    }
+  }
+}, false);
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') {
+    //Trigger animation
+    //Get clicked number key
+    let clearButton = document.querySelector('.clear-button');
+
+    //Trigger animation
+    clearButton.style.transform = "scale(1.1)";
+    clearButton.style.backgroundColor = 'grey';
+    setTimeout(() => {
+      clearButton.style.transform = "scale(1)";
+      clearButton.style.backgroundColor = 'black';
+    }, 150)
+
+    //Clear and reset calculations
+    displayScreen.style.fontSize = '80px';
+    displayScreen.textContent = '0';
+    userInputStateActive = true;
+    currentOperator = null;
+    inputNumbers = [];
+  }
+}, false);
 
 //Get operator buttons
 const operatorBtnArray = document.querySelectorAll('.operator');
@@ -106,6 +252,7 @@ for (let i = 0; i < operatorBtnArray.length; i++) {
   });
 }
 
+
 //Creates a very specific calculator buttons grid
 function createCalculatorGrid() {
   let buttonTextValue = 7;
@@ -160,10 +307,13 @@ function createCalculatorGrid() {
       buttonContainer.appendChild(gridItem);
     }
   }
+
+  //All Clear button
   const clearBtn = document.createElement('button');
   clearBtn.classList.add('clear-button');
   clearBtn.textContent = 'AC';
   clearBtn.addEventListener('click', () => {
+    displayScreen.style.fontSize = '80px';
     displayScreen.textContent = '0';
     userInputStateActive = true;
     currentOperator = null;
@@ -244,7 +394,6 @@ function roundResult(result) {
   let resultLength = result.toString().length;
   if (resultLength > 11) {
     result = result / Math.pow(10, resultLength - 1);
-    // let decimalLength = result.toString().length - 2;
     let rounder = Math.pow(10, 9);
     result = Math.round(result * rounder) / rounder;
   }
@@ -292,7 +441,8 @@ function multiply(value) {
 function divide(divisor) {
   //if divisor is zero then do nothing
   if (!divisor) {
-    displayScreen.textContent = 'Division by zero!';
+    displayScreen.style.fontSize = '40px';
+    displayScreen.textContent = 'To infinity and beyond!';
     return;
   }
   //Add input number to array
