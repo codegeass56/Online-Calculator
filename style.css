@@ -3,18 +3,43 @@
   justify-content: center;
 }
 
+body {
+  background-color: antiquewhite;
+}
+
 .calculatorContainer {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 640px;
+  width: 450px;
+  border: 1px solid grey;
+  padding: 20px;
+  border-radius: 25px;
+  box-shadow: 0px 5px 10px;
+  background-color: black;
+}
+
+h1 {
+  font-size: 60px;
+  color: white;
 }
 
 .screen-container {
   border: 1px solid black;
   width: inherit;
-  height: 40px;
+  height: 90px;
+  margin-bottom: 20px;
+  background-color: #333;
+  border-radius: 8px;
+}
+
+.screen-content {
+  font-size: 85px;
+  color: white;
+  height: inherit;
+  margin: auto;
+  text-align: right;
 }
 
 .buttons-container {
@@ -23,4 +48,52 @@
   grid-template-rows: repeat(5, auto);
   width: inherit;
   gap: 20px;
+}
+
+button {
+  width: 90px;
+  height: 90px;
+  background-color: black;
+  color: aqua;
+  border: none;
+  font-size: 60px;
+  box-shadow: 0px 5px 10px rgba(darken(white, 40%));
+  transition: all .2s;
+  cursor: pointer;
+  border-radius: 5px;
+  border-bottom: 4px solid lighten(gray, 70%);
+}
+
+button:hover:active {
+  scale: 1;
+}
+
+button:hover {
+  scale: 1.1;
+  background-color: grey;
+}
+
+.clear-button {
+  font-size: 50px;
+  color: crimson;
+}
+
+.clear-button:active {
+  color: crimson;
+}
+
+.add-button {
+  color: green;
+}
+
+.subtract-button {
+  color: red;
+}
+
+.multiply-button {
+  color: goldenrod;
+}
+
+.divide-button {
+  color: burlywood;
 }
