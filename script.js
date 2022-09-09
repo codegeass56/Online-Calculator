@@ -40,9 +40,10 @@ for (let i = 0; i < numBtnArray.length; i++) {
       displayScreen.textContent = '';
       userInputStateActive = false;
     }
-    //Append number to screen value
-    displayScreen.textContent += numBtnArray[i].textContent;
-
+    if (displayScreen.textContent.length < 11) {
+      //Append number to screen value
+      displayScreen.textContent += numBtnArray[i].textContent;
+    }
     //Clear any previous calculation result
     if (prevResult) {
       prevResult = null;
@@ -218,15 +219,7 @@ function operate(operatorName, value) {
 
       //Finalize result if equals button is clicked
       case equalsBtnClassName:
-        if (currentOperator === 'add') {
-          showFinalResult(value);
-        } else if (currentOperator === 'subtract') {
-          showFinalResult(value);
-        } else if (currentOperator === 'multiply') {
-          showFinalResult(value);
-        } else if (currentOperator === 'divide') {
-          showFinalResult(value);
-        }
+        showFinalResult(value);
         break;
     }
   }
@@ -247,14 +240,24 @@ function showFinalResult(lastInput) {
   currentOperator = null;
   inputNumbers = [];
 }
-
+function roundResult(result) {
+  let resultLength = result.toString().length;
+  if (resultLength > 11) {
+    result = result / Math.pow(10, resultLength - 1);
+    // let decimalLength = result.toString().length - 2;
+    let rounder = Math.pow(10, 9);
+    result = Math.round(result * rounder) / rounder;
+  }
+  return result;
+}
 function add(value) {
   //Add input number to array
   inputNumbers.push(value);
 
   //Check if it is a chaining operation involving more than 2 numbers
   if (inputNumbers.length >= 2) {
-    displayScreen.textContent = inputNumbers.reduce((previousValue, currentValue) => previousValue + currentValue);
+    let result = inputNumbers.reduce((previousValue, currentValue) => previousValue + currentValue);
+    displayScreen.textContent = roundResult(result);
     inputNumbers = [];
     inputNumbers.push(Number(displayScreen.textContent));
   }
@@ -266,7 +269,8 @@ function subtract(value) {
 
   //Check if it is a chaining operation involving more than 2 numbers
   if (inputNumbers.length >= 2) {
-    displayScreen.textContent = inputNumbers.reduce((previousValue, currentValue) => previousValue - currentValue);
+    let result = inputNumbers.reduce((previousValue, currentValue) => previousValue - currentValue);
+    displayScreen.textContent = roundResult(result);
     inputNumbers = [];
     inputNumbers.push(Number(displayScreen.textContent));
   }
@@ -278,7 +282,8 @@ function multiply(value) {
 
   //Check if it is a chaining operation involving more than 2 numbers
   if (inputNumbers.length >= 2) {
-    displayScreen.textContent = inputNumbers.reduce((previousValue, currentValue) => previousValue * currentValue);
+    let result = inputNumbers.reduce((previousValue, currentValue) => previousValue * currentValue);
+    displayScreen.textContent = roundResult(result);
     inputNumbers = [];
     inputNumbers.push(Number(displayScreen.textContent));
   }
@@ -295,7 +300,8 @@ function divide(divisor) {
 
   //Check if it is a chaining operation involving more than 2 numbers
   if (inputNumbers.length >= 2) {
-    displayScreen.textContent = Math.round(inputNumbers.reduce((previousValue, currentValue) => previousValue / currentValue));
+    let result = inputNumbers.reduce((previousValue, currentValue) => previousValue / currentValue);
+    displayScreen.textContent = roundResult(result);
     inputNumbers = [];
     inputNumbers.push(Number(displayScreen.textContent));
   }

@@ -12,7 +12,7 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 450px;
+  width: 475px;
   border: 1px solid grey;
   padding: 20px;
   border-radius: 25px;
@@ -35,7 +35,7 @@ h1 {
 }
 
 .screen-content {
-  font-size: 85px;
+  font-size: 80px;
   color: white;
   height: inherit;
   margin: auto;
