@@ -11,6 +11,9 @@ let prevResult = null;
 //Holds the sequence of number inputs
 let inputNumbers = [];
 
+//Holds the screen character limit
+const SCREEN_CHAR_LIMIT = 11;
+
 //Class names assigned to buttons
 const numBtnClassName = 'number-button';
 const operatorBtnClassName = 'operator';
@@ -20,6 +23,9 @@ const multiplyBtnClassName = 'multiply-button';
 const divideBtnClassName = 'divide-button';
 const equalsBtnClassName = 'equals-button';
 const dotBtnClassName = 'dot-button';
+const mouseHoverClassName = 'mouse-hover-active';
+const keyboardHoverClassName = 'keyboard-hover-active';
+const clearBtnClassName = 'clear-button';
 
 //Get display screen and set to default value
 const displayScreen = document.querySelector('.screen-content');
@@ -27,7 +33,7 @@ displayScreen.textContent = '0';
 
 //Create calculator buttons grid
 const buttonContainer = document.querySelector('.buttons-container');
-createCalculatorGrid();
+createCalculatorButtons();
 
 // Get number buttons
 const numBtnArray = document.querySelectorAll('.number-button');
@@ -38,16 +44,30 @@ for (let i = 0; i < numBtnArray.length; i++) {
     displayScreen.style.fontSize = '80px';
     //Check for previous user input
     if (userInputStateActive) {
-      displayScreen.textContent = '';
+      //Clear any previous calculation result
+      if (prevResult != null) {
+        if (numBtnArray[i].textContent === '.') {
+          displayScreen.textContent = '0';
+        } else {
+          displayScreen.textContent = '';
+        }
+        prevResult = null;
+      }
+      if (numBtnArray[i].textContent === '.') {
+        displayScreen.textContent = '0';
+      } else {
+        displayScreen.textContent = '';
+      }
       userInputStateActive = false;
     }
-    if (displayScreen.textContent.length < 11) {
+    if (displayScreen.textContent.length < SCREEN_CHAR_LIMIT) {
+      if (numBtnArray[i].textContent === '.') {
+        if (displayScreen.textContent.includes('.')) {
+          return;
+        }
+      }
       //Append number to screen value
       displayScreen.textContent += numBtnArray[i].textContent;
-    }
-    //Clear any previous calculation result
-    if (prevResult) {
-      prevResult = null;
     }
   });
 }
@@ -55,68 +75,83 @@ for (let i = 0; i < numBtnArray.length; i++) {
 /*Keyboard events*/
 document.addEventListener('keypress', (event) => {
   //Check if number key is pressed
-  if (isNaN(event.key) === false) {
+  if (isNaN(event.key) === false || event.key === '.') {
     displayScreen.style.fontSize = '80px';
     //Get clicked number key
     let numberButtons = document.querySelectorAll('.' + numBtnClassName);
     let clickedButton = Array.from(numberButtons).find(element => element.textContent === event.key);
 
-    //Trigger animation
-    clickedButton.style.transform = "scale(1.1)";
-    clickedButton.style.backgroundColor = 'grey';
-    setTimeout(() => {
-      clickedButton.style.transform = "scale(1)";
-      clickedButton.style.backgroundColor = 'black';
-    }, 150)
+    triggerButtonAnimation(clickedButton);
 
+    // //Check for previous user input
+    // if (userInputStateActive) {
+    //   displayScreen.textContent = '';
+    //   userInputStateActive = false;
+    // }
+    // if (displayScreen.textContent.length < SCREEN_CHAR_LIMIT) {
+    //   //Append number to screen value
+    //   displayScreen.textContent += event.key;
+    // }
+    // //Clear any previous calculation result
+    // if (prevResult) {
+    //   prevResult = null;
+    // }
     //Check for previous user input
     if (userInputStateActive) {
-      displayScreen.textContent = '';
+      //Clear any previous calculation result
+      if (prevResult != null) {
+        if (event.key === '.') {
+          displayScreen.textContent = '0';
+        } else {
+          displayScreen.textContent = '';
+        }
+        prevResult = null;
+      }
+      if (event.key === '.') {
+        displayScreen.textContent = '0';
+      } else {
+        displayScreen.textContent = '';
+      }
       userInputStateActive = false;
     }
-    if (displayScreen.textContent.length < 11) {
+    if (displayScreen.textContent.length < SCREEN_CHAR_LIMIT) {
+      if (event.key === '.') {
+        if (displayScreen.textContent.includes('.')) {
+          return;
+        }
+      }
       //Append number to screen value
       displayScreen.textContent += event.key;
-    }
-    //Clear any previous calculation result
-    if (prevResult) {
-      prevResult = null;
     }
   }
   //Check if operator key is pressed
   else {
     //Get clicked operator key
     let operatorButtons = document.querySelectorAll('.' + operatorBtnClassName);
+    let operatorButtonsArray = Array.from(operatorButtons);
     let clickedButton;
     switch (event.key) {
-      case '+': clickedButton = Array.from(operatorButtons)
+      case '+': clickedButton = operatorButtonsArray
         .find(element => element.textContent === '+');
         break;
-      case '-': clickedButton = Array.from(operatorButtons)
+      case '-': clickedButton = operatorButtonsArray
         .find(element => element.textContent === '-');
         break;
       case 'X':
       case '*':
-      case 'x': clickedButton = Array.from(operatorButtons)
+      case 'x': clickedButton = operatorButtonsArray
         .find(element => element.textContent === 'x');
         break;
-      case '/': clickedButton = Array.from(operatorButtons)
+      case '/': clickedButton = operatorButtonsArray
         .find(element => element.textContent === '÷');
         break;
       case 'Enter':
-      case '=': clickedButton = Array.from(operatorButtons)
+      case '=': clickedButton = operatorButtonsArray
         .find(element => element.textContent === '=');
         break;
       default: return;
     }
-
-    //Trigger animation
-    clickedButton.style.transform = "scale(1.1)";
-    clickedButton.style.backgroundColor = 'grey';
-    setTimeout(() => {
-      clickedButton.style.transform = "scale(1)";
-      clickedButton.style.backgroundColor = 'black';
-    }, 150)
+    triggerButtonAnimation(clickedButton);
     if (prevResult) {
       inputNumbers.push(prevResult); //Append previous result to array of inputs
       prevResult = null;
@@ -174,28 +209,17 @@ document.addEventListener('keypress', (event) => {
   }
 }, false);
 
+//Escape keyboard key
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') {
-    //Trigger animation
     //Get clicked number key
     let clearButton = document.querySelector('.clear-button');
-
-    //Trigger animation
-    clearButton.style.transform = "scale(1.1)";
-    clearButton.style.backgroundColor = 'grey';
-    setTimeout(() => {
-      clearButton.style.transform = "scale(1)";
-      clearButton.style.backgroundColor = 'black';
-    }, 150)
-
-    //Clear and reset calculations
-    displayScreen.style.fontSize = '80px';
-    displayScreen.textContent = '0';
-    userInputStateActive = true;
-    currentOperator = null;
-    inputNumbers = [];
+    triggerButtonAnimation(clearButton);
+    clearAndReset();
   }
 }, false);
+
+
 
 //Get operator buttons
 const operatorBtnArray = document.querySelectorAll('.operator');
@@ -212,7 +236,8 @@ for (let i = 0; i < operatorBtnArray.length; i++) {
     if (operatorBtnArray[i].classList.contains(addBtnClassName)) {
       //Check if any pending operation is to be performed to update the display
       if (currentOperator != null && currentOperator != 'add') {
-        executePrevOperation(addBtnClassName);
+        executePrevOperation();
+        setOperator(addBtnClassName);
       } else {
         if (currentOperator != 'add') {
           currentOperator = 'add';
@@ -221,7 +246,8 @@ for (let i = 0; i < operatorBtnArray.length; i++) {
       }
     } else if (operatorBtnArray[i].classList.contains(subtractBtnClassName)) {
       if (currentOperator != null && currentOperator != 'subtract') {
-        executePrevOperation(subtractBtnClassName);
+        executePrevOperation();
+        setOperator(subtractBtnClassName);
       } else {
         if (currentOperator != 'subtract') {
           currentOperator = 'subtract';
@@ -230,7 +256,8 @@ for (let i = 0; i < operatorBtnArray.length; i++) {
       }
     } else if (operatorBtnArray[i].classList.contains(multiplyBtnClassName)) {
       if (currentOperator != null && currentOperator != 'multiply') {
-        executePrevOperation(multiplyBtnClassName);
+        executePrevOperation();
+        setOperator(multiplyBtnClassName);
       } else {
         if (currentOperator != 'multiply') {
           currentOperator = 'multiply';
@@ -239,7 +266,8 @@ for (let i = 0; i < operatorBtnArray.length; i++) {
       }
     } else if (operatorBtnArray[i].classList.contains(divideBtnClassName)) {
       if (currentOperator != null && currentOperator != 'divide') {
-        executePrevOperation(divideBtnClassName);
+        executePrevOperation();
+        setOperator(divideBtnClassName);
       } else {
         if (currentOperator != 'divide') {
           currentOperator = 'divide';
@@ -252,9 +280,19 @@ for (let i = 0; i < operatorBtnArray.length; i++) {
   });
 }
 
+//Triggers the hover and active animations of the button
+function triggerButtonAnimation(button) {
+  //Trigger animation
+  button.classList.add(keyboardHoverClassName);
+  button.classList.remove(mouseHoverClassName);
+  setTimeout(() => {
+    button.classList.add(mouseHoverClassName);
+    button.classList.remove(keyboardHoverClassName);
+  }, 150)
+}
 
 //Creates a very specific calculator buttons grid
-function createCalculatorGrid() {
+function createCalculatorButtons() {
   let buttonTextValue = 7;
   //Create the buttons as grid items
   for (let rowCount = 0; rowCount < 4; rowCount++) {
@@ -265,21 +303,25 @@ function createCalculatorGrid() {
           case 0: gridItem.textContent = '+';
             gridItem.classList.add(operatorBtnClassName);
             gridItem.classList.add(addBtnClassName);
+            gridItem.classList.add(mouseHoverClassName);
             buttonTextValue = 4; break;
 
           case 1: gridItem.textContent = '-';
             gridItem.classList.add(operatorBtnClassName);
             gridItem.classList.add(subtractBtnClassName);
+            gridItem.classList.add(mouseHoverClassName);
             buttonTextValue = 1; break;
 
           case 2: gridItem.textContent = 'x';
             gridItem.classList.add(operatorBtnClassName);
             gridItem.classList.add(multiplyBtnClassName);
+            gridItem.classList.add(mouseHoverClassName);
             buttonTextValue = 0; break;
 
           case 3: gridItem.textContent = '÷';
             gridItem.classList.add(operatorBtnClassName);
             gridItem.classList.add(divideBtnClassName);
+            gridItem.classList.add(mouseHoverClassName);
             break;
         }
       } else {
@@ -287,20 +329,25 @@ function createCalculatorGrid() {
           switch (colCount) {
             case 0: gridItem.textContent = `${buttonTextValue}`;
               gridItem.classList.add(numBtnClassName);
+              gridItem.classList.add(mouseHoverClassName);
               break;
 
             case 1: gridItem.textContent = '.';
               gridItem.classList.add(dotBtnClassName);
+              gridItem.classList.add(numBtnClassName);
+              gridItem.classList.add(mouseHoverClassName);
               break;
 
             case 2: gridItem.textContent = '=';
               gridItem.classList.add(operatorBtnClassName);
               gridItem.classList.add(equalsBtnClassName);
+              gridItem.classList.add(mouseHoverClassName);
               break;
           }
         } else {
           gridItem.textContent = `${buttonTextValue}`;
           gridItem.classList.add(numBtnClassName);
+          gridItem.classList.add(mouseHoverClassName);
           buttonTextValue++;
         }
       }
@@ -310,31 +357,35 @@ function createCalculatorGrid() {
 
   //All Clear button
   const clearBtn = document.createElement('button');
-  clearBtn.classList.add('clear-button');
+  clearBtn.classList.add(clearBtnClassName);
+  clearBtn.classList.add(mouseHoverClassName);
   clearBtn.textContent = 'AC';
-  clearBtn.addEventListener('click', () => {
-    displayScreen.style.fontSize = '80px';
-    displayScreen.textContent = '0';
-    userInputStateActive = true;
-    currentOperator = null;
-    inputNumbers = [];
-  });
+  clearBtn.addEventListener('click', clearAndReset);
   buttonContainer.appendChild(clearBtn);
-
 }
 
-//Executes the previous operation and sets the next operation
-function executePrevOperation(nextOperationToBeSet) {
-  //Execute previous operation
+//Clear and reset calculator
+function clearAndReset() {
+  displayScreen.style.fontSize = '80px';
+  displayScreen.textContent = '0';
+  userInputStateActive = true;
+  currentOperator = null;
+  inputNumbers = [];
+}
+
+//Executes the previous operation
+function executePrevOperation() {
   switch (currentOperator) {
     case 'add': operate(addBtnClassName, Number(displayScreen.textContent)); break;
     case 'subtract': operate(subtractBtnClassName, Number(displayScreen.textContent)); break;
     case 'multiply': operate(multiplyBtnClassName, Number(displayScreen.textContent)); break;
     case 'divide': operate(divideBtnClassName, Number(displayScreen.textContent)); break;
   }
+}
 
-  //Set the next operation
-  switch (nextOperationToBeSet) {
+//Sets the operator based on the given name
+function setOperator(operatorBtnClassName) {
+  switch (operatorBtnClassName) {
     case addBtnClassName: currentOperator = 'add'; break;
     case subtractBtnClassName: currentOperator = 'subtract'; break;
     case multiplyBtnClassName: currentOperator = 'multiply'; break;
@@ -390,15 +441,36 @@ function showFinalResult(lastInput) {
   currentOperator = null;
   inputNumbers = [];
 }
+
+//Round the result accurately
 function roundResult(result) {
-  let resultLength = result.toString().length;
-  if (resultLength > 11) {
-    result = result / Math.pow(10, resultLength - 1);
-    let rounder = Math.pow(10, 9);
-    result = Math.round(result * rounder) / rounder;
+  let resultString = result.toString();
+  let resultLength = resultString.length;
+  if (resultLength > SCREEN_CHAR_LIMIT) {
+    let rounder;
+    if (resultString.includes('.')) {
+      // rounder = Math.pow(10, 6);
+      let decimalPosition = resultString.indexOf('.');
+      let numberBeforeDecimal = resultString.substring(0, decimalPosition);
+
+      if (numberBeforeDecimal.length > SCREEN_CHAR_LIMIT) {
+        rounder = Math.pow(10, numberBeforeDecimal.length - SCREEN_CHAR_LIMIT);
+        result = Math.round(Number(numberBeforeDecimal) / rounder);
+      } else if (numberBeforeDecimal.length === SCREEN_CHAR_LIMIT) {
+        result = Math.round(result);
+      } else {
+        rounder = Math.pow(10, SCREEN_CHAR_LIMIT - numberBeforeDecimal.length);
+        result = Math.round(result * rounder) / rounder;
+      }
+    } else {
+      result = result / Math.pow(10, resultLength - 1);
+      rounder = Math.pow(10, 9);
+      result = Math.round(result * rounder) / rounder;
+    }
   }
   return result;
 }
+
 function add(value) {
   //Add input number to array
   inputNumbers.push(value);
@@ -407,6 +479,8 @@ function add(value) {
   if (inputNumbers.length >= 2) {
     let result = inputNumbers.reduce((previousValue, currentValue) => previousValue + currentValue);
     displayScreen.textContent = roundResult(result);
+
+    //Make the result the first element of the array
     inputNumbers = [];
     inputNumbers.push(Number(displayScreen.textContent));
   }
@@ -420,6 +494,8 @@ function subtract(value) {
   if (inputNumbers.length >= 2) {
     let result = inputNumbers.reduce((previousValue, currentValue) => previousValue - currentValue);
     displayScreen.textContent = roundResult(result);
+
+    //Make the result the first element of the array
     inputNumbers = [];
     inputNumbers.push(Number(displayScreen.textContent));
   }
@@ -433,6 +509,8 @@ function multiply(value) {
   if (inputNumbers.length >= 2) {
     let result = inputNumbers.reduce((previousValue, currentValue) => previousValue * currentValue);
     displayScreen.textContent = roundResult(result);
+
+    //Make the result the first element of the array
     inputNumbers = [];
     inputNumbers.push(Number(displayScreen.textContent));
   }
@@ -452,6 +530,8 @@ function divide(divisor) {
   if (inputNumbers.length >= 2) {
     let result = inputNumbers.reduce((previousValue, currentValue) => previousValue / currentValue);
     displayScreen.textContent = roundResult(result);
+
+    //Make the result the first element of the array
     inputNumbers = [];
     inputNumbers.push(Number(displayScreen.textContent));
   }

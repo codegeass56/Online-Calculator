@@ -35,6 +35,7 @@ h1 {
 }
 
 .screen-content {
+  font-family: 'Times New Roman', Times, serif;
   font-size: 80px;
   color: white;
   height: inherit;
@@ -64,13 +65,23 @@ button {
   border-bottom: 4px solid lighten(gray, 70%);
 }
 
-button:hover:active {
+/* button:hover:active {
   scale: 1;
 }
 
 button:hover {
   scale: 1.1;
   background-color: grey;
+} */
+
+.mouse-hover-active:hover:active {
+  scale: 1;
+}
+
+.mouse-hover-active:hover,
+.keyboard-hover-active {
+  scale: 1.1;
+  background-color: hsla(0, 0%, 50%, 0.24);
 }
 
 .clear-button {
